@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    .update-seed-container {
+      margin-bottom: 10px;
+    }
+    .seed-input {
+      width: 100%;
+      height: 150px;
+    }
+    .seed-box {
+      width: 100%;
+      height: 300px;
+      overflow: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="update-seed-container">
+    <h2>Update Seed</h2>
+    <textarea id="seedInput" class="seed-input" placeholder="Paste seed here..."></textarea>
+    <button onclick="saveSeed()">Save Seed</button>
+    <button onclick="getUpdatedSeed()">Get Updated Seed</button>
+  </div>
+  <div id="seedBox" class="seed-box"></div>
+  <script>
+    function saveSeed() {
+      var seedData = document.getElementById('seedInput').value;
+      if (seedData.trim() === '') {
+        alert('Please paste seed data into the textarea.');
+        return;
+      }
+      google.script.run.withSuccessHandler(function(response) {
+        document.getElementById('seedInput').value = '';
+        document.getElementById('seedBox').textContent = 'Seed saved to row ' + response.row + '.';
+      }).updateSeed(seedData);
+    }
+
+    function getUpdatedSeed() {
+      google.script.run.withSuccessHandler(function(response) {
+        document.getElementById('seedBox').textContent = response.seed;
+      }).getUpdatedSeed(); // Now calls getUpdatedSeed function
+    }
+  </script>
+</body>
+</html>

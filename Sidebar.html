@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { 
+        font-family: Arial, sans-serif; 
+        padding: 10px; 
+      }
+      /* Logo styling */
+      .logo {
+        width: 150px;
+        display: block;
+        margin-bottom: 20px;
+      }
+      button {
+        background-color: #f36; /* Updated button color */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+      }
+      #result { 
+        margin-top: 20px; 
+      }
+      #seedBox {
+        background-color: #f1f1f1;
+        padding: 10px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        font-family: monospace;
+        font-size: 14px;
+        word-wrap: break-word;
+        white-space: pre-wrap;
+        height: 200px;
+        overflow: auto; /* Enable scrolling */
+      }
+      #copySeedButton {
+        margin-top: 10px;
+      }
+      textarea {
+        width: 100%;
+        height: 150px; /* Larger sales notes box */
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin-top: 10px;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        box-sizing: border-box;
+        font-size: 14px;
+        border: 1px solid #ccc;
+      }
+      h3 {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Fyle Logo -->
+    <img src="https://www.remotework360.com/wp-content/uploads/2020/06/2054.png" alt="Fyle Logo" class="logo">
+
+    <h2>Seed Generator</h2>
+    <p>Enter sales notes and backend URL (optional) below, and click the button to generate seed data:</p>
+    
+    <!-- Input for custom backend URL -->
+    <input type="text" id="backendUrl" placeholder="Enter backend URL (optional)">
+    
+    <!-- Sales notes textarea -->
+    <textarea id="salesNotes" placeholder="Enter sales notes here..."></textarea>
+    <br>
+    <button onclick="sendData()">Generate Seed</button>
+    
+    <h3>Generated Seed:</h3>
+    <div id="seedBox"></div>
+    <button id="copySeedButton" onclick="copySeed()">Copy Seed</button>
+    
+    <script>
+      const defaultBackendUrl = 'https://4a87-182-71-246-66.ngrok-free.app/generate-seed';
+
+      function sendData() {
+        document.getElementById('seedBox').textContent = 'Generating seed...';
+        
+        // Get the custom backend URL or fall back to the default URL
+        const backendUrl = document.getElementById('backendUrl').value || defaultBackendUrl;
+        
+        // Get sales notes
+        const salesNotes = document.getElementById('salesNotes').value;
+
+        // Call the Apps Script backend with the data
+        google.script.run
+          .withSuccessHandler(showResult)
+          .withFailureHandler(showError)
+          .extractDataAndSend(salesNotes, backendUrl);  // Pass the sales notes and URL to the script
+      }
+      
+      function showResult(result) {
+        // Format the seed as a pretty-printed JSON string and display it in the seed box
+        let formattedSeed = JSON.stringify(JSON.parse(result.seed), null, 2);  // Parse and pretty-print seed
+        document.getElementById('seedBox').textContent = formattedSeed;
+      }
+      
+      function showError(error) {
+        console.error('Error:', error);
+        document.getElementById('seedBox').textContent = 'Error: ' + (error.message || error);
+      }
+
+      function copySeed() {
+        var seedBox = document.getElementById('seedBox');
+        var range = document.createRange();
+        range.selectNode(seedBox);
+        window.getSelection().removeAllRanges();  // Clear previous selections
+        window.getSelection().addRange(range);    // Select the text
+        document.execCommand('copy');             // Copy the selected text
+        window.getSelection().removeAllRanges();  // Clear selection
+        alert('Seed copied to clipboard!');
+      }
+    </script>
+  </body>
+</html>
